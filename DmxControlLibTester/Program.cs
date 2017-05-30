@@ -10,12 +10,16 @@ namespace DmxControlLibTester
 {
     class Program
     {
+        public static LPMMap Mapping;
+
         static void Main(string[] args)
         {
+            int ind = 0;
+
             DmxController.Connect(); //connection du controlleur DMX
             LaunchPadControl.Connect(); //connection du launchpad Midi
 
-            LaunchPadControl.LaunchPadInput += Inputevent;
+            Mapping = new LPMMap("Launchpad Mini");
 
             #region Test DmxControlleur
             DmxController.WriteValue(1, 255);
@@ -23,70 +27,118 @@ namespace DmxControlLibTester
             DmxController.WriteValue(8, 128);
             #endregion
 
-            #region Test LaunchPadControl
+            #region Test Mapping
+            ind = Mapping.BT.FindIndex(x => x.ID == 2);
 
-            //O
-            LaunchPadControl.Led(33, ButtonColor.Green, false, false);
+            Mapping.BT[ind].Type = buttonType.Momentary;
+            Mapping.BT[ind].onColor = ButtonColor.Ambre;
+            Mapping.BT[ind].onFlashing = true;
+            Mapping.BT[ind].offColor = ButtonColor.Green;
+            Mapping.BT[ind].offFlashing = false;
 
-            LaunchPadControl.Led(48, ButtonColor.Green, false, false);
-            LaunchPadControl.Led(64, ButtonColor.Green, false, false);
 
-            LaunchPadControl.Led(81, ButtonColor.Green, false, false);
+            ind = Mapping.BT.FindIndex(x => x.ID == 19);
 
-            LaunchPadControl.Led(50, ButtonColor.Green, false, false);
-            LaunchPadControl.Led(66, ButtonColor.Green, false, false);
+            Mapping.BT[ind].Type = buttonType.Momentary;
+            Mapping.BT[ind].onColor = ButtonColor.Red;
+            Mapping.BT[ind].onFlashing = true;
+            Mapping.BT[ind].offColor = ButtonColor.Red;
+            Mapping.BT[ind].offFlashing = false;
 
-            //K
-            LaunchPadControl.Led(36, ButtonColor.Green, false, false);
-            LaunchPadControl.Led(52, ButtonColor.Green, false, false);
-            LaunchPadControl.Led(68, ButtonColor.Green, false, false);
-            LaunchPadControl.Led(84, ButtonColor.Green, false, false);
 
-            LaunchPadControl.Led(53, ButtonColor.Green, false, false);
-            LaunchPadControl.Led(38, ButtonColor.Green, false, false);
+            ind = Mapping.BT.FindIndex(x => x.ID == 37);
 
-            LaunchPadControl.Led(69, ButtonColor.Green, false, false);
-            LaunchPadControl.Led(86, ButtonColor.Green, false, false);
+            Mapping.BT[ind].Type = buttonType.Momentary;
+            Mapping.BT[ind].onColor = ButtonColor.None;
+            Mapping.BT[ind].onFlashing = false;
+            Mapping.BT[ind].offColor = ButtonColor.Yellow;
+            Mapping.BT[ind].offFlashing = false;
 
-            Console.ReadKey(false);
 
-            LaunchPadControl.Led(33, ButtonColor.None, false, false);
+            ind = Mapping.BT.FindIndex(x => x.ID == 72);
 
-            LaunchPadControl.Led(48, ButtonColor.None, false, false);
-            LaunchPadControl.Led(64, ButtonColor.None, false, false);
+            Mapping.BT[ind].Type = buttonType.Momentary;
+            Mapping.BT[ind].onColor = ButtonColor.Red;
+            Mapping.BT[ind].onFlashing = false;
+            Mapping.BT[ind].offColor = ButtonColor.Green;
+            Mapping.BT[ind].offFlashing = true;
 
-            LaunchPadControl.Led(81, ButtonColor.None, false, false);
 
-            LaunchPadControl.Led(50, ButtonColor.None, false, false);
-            LaunchPadControl.Led(66, ButtonColor.None, false, false);
+            ind = Mapping.BT.FindIndex(x => x.ID == 99);
 
-            LaunchPadControl.Led(36, ButtonColor.None, false, false);
-            LaunchPadControl.Led(52, ButtonColor.None, false, false);
-            LaunchPadControl.Led(68, ButtonColor.None, false, false);
-            LaunchPadControl.Led(84, ButtonColor.None, false, false);
+            Mapping.BT[ind].Type = buttonType.Momentary;
+            Mapping.BT[ind].onColor = ButtonColor.Red;
+            Mapping.BT[ind].onFlashing = false;
+            Mapping.BT[ind].offColor = ButtonColor.Green;
+            Mapping.BT[ind].offFlashing = true;
 
-            LaunchPadControl.Led(53, ButtonColor.None, false, false);
-            LaunchPadControl.Led(38, ButtonColor.None, false, false);
 
-            LaunchPadControl.Led(69, ButtonColor.None, false, false);
-            LaunchPadControl.Led(86, ButtonColor.None, false, false);
+            ind = Mapping.BT.FindIndex(x => x.ID == 64);
+
+            Mapping.BT[ind].Type = buttonType.Momentary;
+            Mapping.BT[ind].onColor = ButtonColor.Red;
+            Mapping.BT[ind].onFlashing = false;
+            Mapping.BT[ind].offColor = ButtonColor.Green;
+            Mapping.BT[ind].offFlashing = true;
+
+
+            ind = Mapping.BT.FindIndex(x => x.ID == 82);
+
+            Mapping.BT[ind].Type = buttonType.Momentary;
+            Mapping.BT[ind].onColor = ButtonColor.Red;
+            Mapping.BT[ind].onFlashing = false;
+            Mapping.BT[ind].offColor = ButtonColor.Green;
+            Mapping.BT[ind].offFlashing = true;
+
+
+            ind = Mapping.BT.FindIndex(x => x.ID == 117);
+
+            Mapping.BT[ind].Type = buttonType.Momentary;
+            Mapping.BT[ind].onColor = ButtonColor.Red;
+            Mapping.BT[ind].onFlashing = false;
+            Mapping.BT[ind].offColor = ButtonColor.Green;
+            Mapping.BT[ind].offFlashing = true;
+
+
+            ind = Mapping.BT.FindIndex(x => x.ID == 0);
+
+            Mapping.BT[ind].Type = buttonType.Momentary;
+            Mapping.BT[ind].onColor = ButtonColor.Red;
+            Mapping.BT[ind].onFlashing = false;
+            Mapping.BT[ind].offColor = ButtonColor.Green;
+            Mapping.BT[ind].offFlashing = true;
+
+
+            ind = Mapping.BT.FindIndex(x => x.ID == 120);
+
+            Mapping.BT[ind].Type = buttonType.Momentary;
+            Mapping.BT[ind].onColor = ButtonColor.Red;
+            Mapping.BT[ind].onFlashing = false;
+            Mapping.BT[ind].offColor = ButtonColor.Green;
+            Mapping.BT[ind].offFlashing = true;
+
+            ind = Mapping.SysBT.FindIndex(x => x.ID == 1);
+
+            Mapping.SysBT[ind].Type = buttonType.Momentary;
+            Mapping.SysBT[ind].onColor = ButtonColor.Red;
+            Mapping.SysBT[ind].onFlashing = false;
+            Mapping.SysBT[ind].offColor = ButtonColor.Green;
+            Mapping.SysBT[ind].offFlashing = true;
 
             #endregion
 
-        }
+            LaunchPadControl.LinkMapping(Mapping);
 
-        public static void Inputevent(object sender ,LaunchPadInputEventArgs e)
-        {
-            LaunchPadControl.RunLedtest();
+            Console.ReadKey(true);
+
 
             DmxController.WriteValue(1, 0);
             DmxController.WriteValue(6, 0);
             DmxController.WriteValue(8, 0);
-
-            DmxController.Close();
-            LaunchPadControl.close();
-
+            LaunchPadControl.RunLedtest();
             Environment.Exit(0);
+
         }
+
     }
 }
