@@ -1,6 +1,6 @@
 ﻿using System;
 using Sanford.Multimedia.Midi;
-using Sanford.Multimedia;
+using DmxControlLib.Utility;
 
 namespace DmxControlLib.Hardware
 {
@@ -183,15 +183,17 @@ namespace DmxControlLib.Hardware
             }
 
             /// <summary>
-            /// Allume une Led
+            /// Gestion des Leds
             /// </summary>
             /// <param name="position"></param>
             /// <param name="color"></param>
             /// <param name="flashing"></param>
             /// <param name="systemLed"></param>
-            public static void LedOn(int position, String color, bool flashing, bool systemLed)
+            public static void Led(int position, ButtonColor color, bool flashing, bool systemLed)
             {
                 int velocity = GetVelocity(color, flashing);
+                
+
 
                 if (systemLed && position >= 0 && position <= 7)
                 {
@@ -205,74 +207,56 @@ namespace DmxControlLib.Hardware
 
             }
 
-            /// <summary>
-            /// éteint une Led
-            /// </summary>
-            /// <param name="position"></param>
-            /// <param name="systemLed"></param>
-            public static void LedOff(int position, bool systemLed)
+        /// <summary>
+        /// renvoi la Data1 "Velocity" pour le LaunchPad
+        /// </summary>
+        /// <param name="color"></param>
+        /// <param name="flashing"></param>
+        /// <returns></returns>
+        private static int GetVelocity(ButtonColor color, bool flashing)
+        {
+            int tempvel = 0;
+            if (color == ButtonColor.Red)
             {
-                int velocity = 12;
-
-                if (systemLed && position >= 0 && position <= 7)
-                {
-                    position = position + 104;
-                    SendChannel(ChannelCommand.Controller, 0, position, velocity);
-                }
-                else if (position >= 0 && position <= 120)
-                {
-                    SendChannel(ChannelCommand.NoteOn, 0, position, velocity);
-                }
-
-
+                tempvel = 15;
+            }
+            else if (color == ButtonColor.Green)
+            {
+                tempvel = 60;
+            }
+            else if (color == ButtonColor.Yellow)
+            {
+                tempvel = 62;
+            }
+            else if (color == ButtonColor.Ambre)
+            {
+                tempvel = 63;
+            }
+            else if (color == ButtonColor.None)
+            {
+                tempvel = 12;
+            }
+            else
+            {
+                tempvel = -1;
             }
 
-            /// <summary>
-            /// renvoi la Data1 "Velocity" pour le LaunchPad
-            /// </summary>
-            /// <param name="color"></param>
-            /// <param name="flashing"></param>
-            /// <returns></returns>
-            private static int GetVelocity(string color, bool flashing)
+            if (flashing)
             {
-                int tempvel = 0;
-                if (color.Equals("Red"))
-                {
-                    tempvel = 15;
-                }
-                else if (color.Equals("Green"))
-                {
-                    tempvel = 60;
-                }
-                else if (color.Equals("Yellow"))
-                {
-                    tempvel = 62;
-                }
-                else if (color.Equals("Ambre"))
-                {
-                    tempvel = 63;
-                }
-                else
-                {
-                    tempvel = -1;
-                }
-
-                if (flashing)
-                {
-                    tempvel = tempvel - 4;
-                    SendChannel(ChannelCommand.Controller, 0, 0, 40);
-                }
-
-
-                return tempvel;
+                tempvel = tempvel - 4;
+                SendChannel(ChannelCommand.Controller, 0, 0, 40);
             }
 
-            /// <summary>
-            /// Event Input, Génere un événement avec la position et l'état de l'input
-            /// </summary>
-            /// <param name="sender"></param>
-            /// <param name="e"></param>
-            private static void HandleChannelMessageReceived(object sender, ChannelMessageEventArgs e)
+
+            return tempvel;
+        }
+
+        /// <summary>
+        /// Event Input, Génere un événement avec la position et l'état de l'input
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void HandleChannelMessageReceived(object sender, ChannelMessageEventArgs e)
             {
                 bool ISSYSTEMLED;
                 int POSITION;
