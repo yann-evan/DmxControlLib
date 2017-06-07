@@ -20,4 +20,13 @@ namespace DmxControlLib.Utility
         Ambre,
         None
     }
+
+    public enum Channeltype
+    {
+        Pan,
+        Tilt,
+        Dimmer,
+        RGB,
+        other
+    }
 }
