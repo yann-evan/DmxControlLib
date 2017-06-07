@@ -9,8 +9,7 @@ namespace DmxControlLib.Utility
     public enum buttonType
     {
         Toogle,
-        Momentary,
-        Temporized
+        Momentary
     }
 
     public enum ButtonColor

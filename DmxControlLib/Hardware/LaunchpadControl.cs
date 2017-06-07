@@ -8,7 +8,7 @@ namespace DmxControlLib.Hardware
     public static class LaunchPadControl
     {
 
-        const string midiDeviceName = "Launchpad Midi"; //nom du controller Midi
+        const string midiDeviceName = "Launchpad Mini"; //nom du controller Midi
 
         /// <summary>
         /// Flux d'entrée depuis Launchpad
@@ -19,6 +19,9 @@ namespace DmxControlLib.Hardware
         /// Flux de sortie vers launchpad
         /// </summary>
         static private OutputDevice _OutputLaunchPad;
+
+
+        static private TeVirtualMIDI _VirtualMidiPort;
 
         /// <summary>
         /// builder pour message midi
@@ -70,6 +73,8 @@ namespace DmxControlLib.Hardware
         /// <exception cref="ErrorMidiConnexionException"></exception>
         public static void Connect()
         {
+            _VirtualMidiPort = new TeVirtualMIDI("VirtualPort");
+
             _msg = new ChannelMessageBuilder();
 
             if (!connected)
@@ -95,7 +100,7 @@ namespace DmxControlLib.Hardware
                         }
                     }
 
-                    _InputLaunchPad = new InputDevice(LaunchpadInID);
+                    _InputLaunchPad = new InputDevice(0);
                     _InputLaunchPad.ChannelMessageReceived += HandleChannelMessageReceived;
 
                     _OutputLaunchPad = new OutputDevice(1);
@@ -118,15 +123,9 @@ namespace DmxControlLib.Hardware
         /// <summary>
         /// allume toute les leds du launchpad puis Reset
         /// </summary>
-        public static void RunLedtest()
+        public static void Reset()
         {
-
-            SendChannel(ChannelCommand.Controller, 0, 0, 127);
-
-            System.Threading.Thread.Sleep(1000);
-
             SendChannel(ChannelCommand.Controller, 0, 0, 0);
-
         }
 
         /// <summary>
@@ -315,6 +314,8 @@ namespace DmxControlLib.Hardware
                 LaunchPadInput(_InputLaunchPad, new LaunchPadInputEventArgs { isSystemLed = ISSYSTEMLED, position = POSITION, isOn = ISON, });
             }
 
+            _VirtualMidiPort.sendCommand(e.Message.GetBytes());
+
             //Mapping
             if (Mapping != null)
             {
@@ -335,6 +336,22 @@ namespace DmxControlLib.Hardware
                     {
                         LaunchPadControl.Led(POSITION, BTlist.Find(x => x.ID == POSITION).onColor, BTlist.Find(x => x.ID == POSITION).onFlashing, ISSYSTEMLED);
                     }
+
+                    if (BTlist.Find(x => x.ID == POSITION).Type == buttonType.Toogle)
+                    {
+                        if (BTlist.Find(x => x.ID == POSITION).IsOnToogle == true)
+                        {
+                            LaunchPadControl.Led(POSITION, BTlist.Find(x => x.ID == POSITION).offColor, BTlist.Find(x => x.ID == POSITION).offFlashing, ISSYSTEMLED);
+                            BTlist.Find(x => x.ID == POSITION).IsOnToogle = false;
+                        }
+                        else
+                        {
+                            LaunchPadControl.Led(POSITION, BTlist.Find(x => x.ID == POSITION).onColor, BTlist.Find(x => x.ID == POSITION).onFlashing, ISSYSTEMLED);
+                            BTlist.Find(x => x.ID == POSITION).IsOnToogle = true;
+                        }
+                            
+                    }
+
                 }
                 else
                 {

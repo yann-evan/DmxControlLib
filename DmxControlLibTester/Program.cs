@@ -26,7 +26,7 @@ namespace DmxControlLibTester
             DmxController.WriteValue(6, 255);
             DmxController.WriteValue(8, 128);
             #endregion
-
+              
             #region Test Mapping
             ind = Mapping.BT.FindIndex(x => x.ID == 2);
 
@@ -132,10 +132,10 @@ namespace DmxControlLibTester
             Console.ReadKey(true);
 
 
-            DmxController.WriteValue(1, 0);
+            DmxController.WriteValue(1, 0); 
             DmxController.WriteValue(6, 0);
             DmxController.WriteValue(8, 0);
-            LaunchPadControl.RunLedtest();
+            LaunchPadControl.Reset();
             Environment.Exit(0);
 
         }

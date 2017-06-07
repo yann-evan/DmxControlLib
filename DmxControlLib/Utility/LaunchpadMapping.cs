@@ -4,10 +4,11 @@ using System.Diagnostics;
 
 namespace DmxControlLib.Utility
 {
+    [Serializable]
     public class LPMMap
     {
 
-        string name;
+        public string name;
 
         public List<Button> SysBT;
         public List<Button> BT;
@@ -41,10 +42,12 @@ namespace DmxControlLib.Utility
 
     }
 
+    [Serializable]
     public class Button
     {
         public int ID;
         public buttonType Type;
+        public bool IsOnToogle;
 
         //off
         public ButtonColor offColor;
@@ -57,6 +60,9 @@ namespace DmxControlLib.Utility
         public Button(int bID)
         {
             ID = bID;
+
+            IsOnToogle = false;
+
             Type = buttonType.Momentary;
 
             offColor = ButtonColor.None;
