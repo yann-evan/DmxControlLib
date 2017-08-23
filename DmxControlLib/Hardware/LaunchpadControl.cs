@@ -100,10 +100,10 @@ namespace DmxControlLib.Hardware
                         }
                     }
 
-                    _InputLaunchPad = new InputDevice(0);
+                    _InputLaunchPad = new InputDevice(LaunchpadInID);
                     _InputLaunchPad.ChannelMessageReceived += HandleChannelMessageReceived;
 
-                    _OutputLaunchPad = new OutputDevice(1);
+                    _OutputLaunchPad = new OutputDevice(LaunchpadOutID);
 
                     _InputLaunchPad.StartRecording();
 
