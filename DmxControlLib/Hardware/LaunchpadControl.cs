@@ -46,12 +46,12 @@ namespace DmxControlLib.Hardware
         /// <summary>
         /// ID du launchpad Out
         /// </summary>
-        static private int LaunchpadOutID;
+        static private int LaunchpadOutID = -1;
 
         /// <summary>
         /// ID du launchpad In
         /// </summary>
-        static private int LaunchpadInID;
+        static private int LaunchpadInID = -1;
 
         /// <summary>
         /// état du controlleur
@@ -184,7 +184,7 @@ namespace DmxControlLib.Hardware
             }
             else
             {
-                throw new NoMidiDeviceConnectedException();
+                 throw new NoMidiDeviceConnectedException();
             }
         }
 
@@ -378,7 +378,7 @@ namespace DmxControlLib.Hardware
     #region Midi Exception
     public class NoMidiDeviceConnectedException : Exception
     {
-        public NoMidiDeviceConnectedException() : base("Aucun Controlleur Midi de connecté")
+        public NoMidiDeviceConnectedException() : base("Aucun Controlleur Launchpad de connecté")
         {
         }
     }

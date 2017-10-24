@@ -1,0 +1,9 @@
+C:\Users\dev\Desktop\DMX Project\Logiciel\DmxControlLib\DmxControlLib\bin\Release\DmxControlLib.dll
+C:\Users\dev\Desktop\DMX Project\Logiciel\DmxControlLib\DmxControlLib\bin\Release\DmxControlLib.pdb
+C:\Users\dev\Desktop\DMX Project\Logiciel\DmxControlLib\DmxControlLib\bin\Release\Sanford.Multimedia.dll
+C:\Users\dev\Desktop\DMX Project\Logiciel\DmxControlLib\DmxControlLib\bin\Release\Sanford.Multimedia.Midi.dll
+C:\Users\dev\Desktop\DMX Project\Logiciel\DmxControlLib\DmxControlLib\bin\Release\Sanford.Threading.dll
+C:\Users\dev\Desktop\DMX Project\Logiciel\DmxControlLib\DmxControlLib\bin\Release\Sanford.Collections.dll
+C:\Users\dev\Desktop\DMX Project\Logiciel\DmxControlLib\DmxControlLib\obj\Release\DmxControlLib.dll
+C:\Users\dev\Desktop\DMX Project\Logiciel\DmxControlLib\DmxControlLib\obj\Release\DmxControlLib.pdb
+C:\Users\dev\Desktop\DMX Project\Logiciel\DmxControlLib\DmxControlLib\obj\Release\DmxControlLib.csprojResolveAssemblyReference.cache
