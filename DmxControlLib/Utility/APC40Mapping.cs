@@ -25,6 +25,11 @@ namespace DmxControlLib.Utility
             {
                 RGBBT.Add(new RGBButton(i));
             }
+
+            for (int i = 82; i < 87; i++)
+            {
+                RGBBT.Add(new RGBButton(i));
+            }
         }
 
     }
@@ -34,6 +39,7 @@ namespace DmxControlLib.Utility
     {
         public int ID;
         public buttonType Type;
+        public int Groupe; //-1 pour none
         public bool IsOnToogle;
 
         //off
@@ -57,6 +63,8 @@ namespace DmxControlLib.Utility
 
             onColor = 0;
             onFlashing = false;
+
+            Groupe = -1;
         }
     }
 }

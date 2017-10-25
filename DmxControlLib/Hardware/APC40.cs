@@ -358,13 +358,25 @@ namespace DmxControlLib.Hardware
                     #region Mapping
                     if (Mapping != null)
                     {
-                        if ((int)_BUTTONID >= 0 && (int)_BUTTONID <= 39)//si Boutton avec Led RGB
+                        if (((int)_BUTTONID >= 0 && (int)_BUTTONID <= 39) || ((int)_BUTTONID >= 82 && (int)_BUTTONID <= 86))//si Boutton avec Led RGB
                         {
                             if(_ISON) // si appui
                             {
                                  if(Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).Type == buttonType.Momentary) //si Bouton Momentanné
                                 {
                                     Led((RGB_Led)(int)_BUTTONID, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).onColor);
+
+                                    if (Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).Groupe != -1)
+                                    {
+                                        foreach (RGBButton bt in Mapping.RGBBT)
+                                        {
+                                            if (bt.Groupe == Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).Groupe && bt.ID != (int)_BUTTONID)
+                                            {
+                                                Led((RGB_Led)bt.ID, Mapping.RGBBT.Find(x => x.ID == bt.ID).offColor);
+                                                Mapping.RGBBT.Find(x => x.ID == bt.ID).IsOnToogle = false;
+                                            }
+                                        }
+                                    }
                                 }
 
                                 if (Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).Type == buttonType.Toogle) //si Bouton Toogle
@@ -378,6 +390,18 @@ namespace DmxControlLib.Hardware
                                     {
                                         Led((RGB_Led)(int)_BUTTONID, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).onColor);
                                         Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).IsOnToogle = true;
+
+                                        if(Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).Groupe != -1)
+                                        {
+                                            foreach (RGBButton bt in Mapping.RGBBT)
+                                            {
+                                                if(bt.Groupe == Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).Groupe && bt.ID != (int)_BUTTONID)
+                                                {
+                                                    Led((RGB_Led)bt.ID, Mapping.RGBBT.Find(x => x.ID == bt.ID).offColor);
+                                                    Mapping.RGBBT.Find(x => x.ID == bt.ID).IsOnToogle = false;
+                                                }
+                                            }
+                                        }
                                     }
                                     
                                 }
@@ -419,9 +443,115 @@ namespace DmxControlLib.Hardware
             _OuputAPC40.Send(new ChannelMessage(ChannelCommand.NoteOn, LedChannel, (int)LedID, Convert.ToInt32(color)));
         }
 
+        public void resetLed()
+        {
+            Led(RGB_Led.Pad0, 0);
+            Led(RGB_Led.Pad8, 0);
+            Led(RGB_Led.Pad16, 0);
+            Led(RGB_Led.Pad24, 0);
+            Led(RGB_Led.Pad32, 0);
+
+            Led(RGB_Led.Pad0 + 1, 0);
+            Led(RGB_Led.Pad8 + 1, 0);
+            Led(RGB_Led.Pad16 + 1, 0);
+            Led(RGB_Led.Pad24 + 1, 0);
+            Led(RGB_Led.Pad32 + 1, 0);
+
+            Led(RGB_Led.Pad0 + 2, 0);
+            Led(RGB_Led.Pad8 + 2, 0);
+            Led(RGB_Led.Pad16 + 2, 0);
+            Led(RGB_Led.Pad24 + 2, 0);
+            Led(RGB_Led.Pad32 + 2, 0);
+
+            Led(RGB_Led.Pad0 + 3, 0);
+            Led(RGB_Led.Pad8 + 3, 0);
+            Led(RGB_Led.Pad16 + 3, 0);
+            Led(RGB_Led.Pad24 + 3, 0);
+            Led(RGB_Led.Pad32 + 3, 0);
+
+            Led(RGB_Led.Pad0 + 4, 0);
+            Led(RGB_Led.Pad8 + 4, 0);
+            Led(RGB_Led.Pad16 + 4, 0);
+            Led(RGB_Led.Pad24 + 4, 0);
+            Led(RGB_Led.Pad32 + 4, 0);
+
+            Led(RGB_Led.Pad0 + 5, 0);
+            Led(RGB_Led.Pad8 + 5, 0);
+            Led(RGB_Led.Pad16 + 5, 0);
+            Led(RGB_Led.Pad24 + 5, 0);
+            Led(RGB_Led.Pad32 + 5, 0);
+
+            Led(RGB_Led.Pad0 + 6, 0);
+            Led(RGB_Led.Pad8 + 6, 0);
+            Led(RGB_Led.Pad16 + 6, 0);
+            Led(RGB_Led.Pad24 + 6, 0);
+            Led(RGB_Led.Pad32 + 6, 0);
+
+            Led(RGB_Led.Pad0 + 7, 0);
+            Led(RGB_Led.Pad8 + 7, 0);
+            Led(RGB_Led.Pad16 + 7, 0);
+            Led(RGB_Led.Pad24 + 7, 0);
+            Led(RGB_Led.Pad32 + 7, 0);
+
+            Led(RGB_Led.Scene_Launch0, 0);
+            Led(RGB_Led.Scene_Launch1, 0);
+            Led(RGB_Led.Scene_Launch2, 0);
+            Led(RGB_Led.Scene_Launch3, 0);
+            Led(RGB_Led.Scene_Launch4, 0);
+
+
+            Led(Button_One_Color_Led.Pan, false);
+            Led(Button_One_Color_Led.Sends, false);
+            Led(Button_One_Color_Led.Metronome, false);
+            Led(Button_One_Color_Led.User, false);
+            Led(Button_One_Color_Led.Play, false);
+            Led(Button_One_Color_Led.Record, false);
+            Led(Button_One_Color_Led.Session, false);
+            Led(Button_One_Color_Led.Device_Left, false);
+            Led(Button_One_Color_Led.Device_Right, false);
+            Led(Button_One_Color_Led.Bank_Left, false);
+            Led(Button_One_Color_Led.Bank_Right, false);
+            Led(Button_One_Color_Led.Dev_On_Off, false);
+            Led(Button_One_Color_Led.Dev_Lock, false);
+            Led(Button_One_Color_Led.Clip_Dev_View, false);
+            Led(Button_One_Color_Led.Detail_View, false);
+            Led(Button_One_Color_Led.Bank, false);
+            Led(Button_One_Color_Led.Master_Button, false);
+
+            for (int i = 0; i < 8; i++)
+            {
+                Led(Button_One_Color_Led_Grouped.Channel_Select, i, false);
+            }
+
+            for (int i = 0; i < 8; i++)
+            {
+                Led(Button_One_Color_Led_Grouped.Clip_Stop, i, false);
+            }
+
+            for (int i = 0; i < 8; i++)
+            {
+                Led(Button_One_Color_Led_Grouped.One, i, false);
+            }
+
+            for (int i = 0; i < 8; i++)
+            {
+                Led(Button_One_Color_Led_Grouped.REC, i, false);
+            }
+
+            for (int i = 0; i < 8; i++)
+            {
+                Led(Button_One_Color_Led_Grouped.Single, i, false);
+            }
+
+            for (int i = 0; i < 8; i++)
+            {
+                Led(Button_dual_Color_led_Grouped.A_B, i, Dual_Color_Color.off);
+            }
+        }
+
         public void AnimatedStartAnimation()
         {
-            int Time = 100;
+            int Time = 10;
             Random rand = new Random();
 
             
@@ -553,108 +683,7 @@ namespace DmxControlLib.Hardware
 
             System.Threading.Thread.Sleep(Time*10);
 
-            Led(RGB_Led.Pad0, 0);
-            Led(RGB_Led.Pad8, 0);
-            Led(RGB_Led.Pad16, 0);
-            Led(RGB_Led.Pad24, 0);
-            Led(RGB_Led.Pad32, 0);
-
-            Led(RGB_Led.Pad0 + 1, 0);
-            Led(RGB_Led.Pad8 + 1, 0);
-            Led(RGB_Led.Pad16 + 1, 0);
-            Led(RGB_Led.Pad24 + 1, 0);
-            Led(RGB_Led.Pad32 + 1, 0);
-
-            Led(RGB_Led.Pad0 + 2, 0);
-            Led(RGB_Led.Pad8 + 2, 0);
-            Led(RGB_Led.Pad16 + 2, 0);
-            Led(RGB_Led.Pad24 + 2, 0);
-            Led(RGB_Led.Pad32 + 2, 0);
-
-            Led(RGB_Led.Pad0 + 3, 0);
-            Led(RGB_Led.Pad8 + 3, 0);
-            Led(RGB_Led.Pad16 + 3, 0);
-            Led(RGB_Led.Pad24 + 3, 0);
-            Led(RGB_Led.Pad32 + 3, 0);
-
-            Led(RGB_Led.Pad0 + 4, 0);
-            Led(RGB_Led.Pad8 + 4, 0);
-            Led(RGB_Led.Pad16 + 4, 0);
-            Led(RGB_Led.Pad24 + 4, 0);
-            Led(RGB_Led.Pad32 + 4, 0);
-
-            Led(RGB_Led.Pad0 + 5, 0);
-            Led(RGB_Led.Pad8 + 5, 0);
-            Led(RGB_Led.Pad16 + 5, 0);
-            Led(RGB_Led.Pad24 + 5, 0);
-            Led(RGB_Led.Pad32 + 5, 0);
-
-            Led(RGB_Led.Pad0 + 6, 0);
-            Led(RGB_Led.Pad8 + 6, 0);
-            Led(RGB_Led.Pad16 + 6, 0);
-            Led(RGB_Led.Pad24 + 6, 0);
-            Led(RGB_Led.Pad32 + 6, 0);
-
-            Led(RGB_Led.Pad0 + 7, 0);
-            Led(RGB_Led.Pad8 + 7, 0);
-            Led(RGB_Led.Pad16 + 7, 0);
-            Led(RGB_Led.Pad24 + 7, 0);
-            Led(RGB_Led.Pad32 + 7, 0);
-
-            Led(RGB_Led.Scene_Launch0, 0);
-            Led(RGB_Led.Scene_Launch1, 0);
-            Led(RGB_Led.Scene_Launch2, 0);
-            Led(RGB_Led.Scene_Launch3, 0);
-            Led(RGB_Led.Scene_Launch4, 0);
-
-
-            Led(Button_One_Color_Led.Pan, false);
-            Led(Button_One_Color_Led.Sends, false);
-            Led(Button_One_Color_Led.Metronome, false);
-            Led(Button_One_Color_Led.User, false);
-            Led(Button_One_Color_Led.Play, false);
-            Led(Button_One_Color_Led.Record, false);
-            Led(Button_One_Color_Led.Session, false);
-            Led(Button_One_Color_Led.Device_Left, false);
-            Led(Button_One_Color_Led.Device_Right, false);
-            Led(Button_One_Color_Led.Bank_Left, false);
-            Led(Button_One_Color_Led.Bank_Right, false);
-            Led(Button_One_Color_Led.Dev_On_Off, false);
-            Led(Button_One_Color_Led.Dev_Lock, false);
-            Led(Button_One_Color_Led.Clip_Dev_View, false);
-            Led(Button_One_Color_Led.Detail_View, false);
-            Led(Button_One_Color_Led.Bank, false);
-            Led(Button_One_Color_Led.Master_Button, false);
-
-            for (int i = 0; i < 8; i++)
-            {
-                Led(Button_One_Color_Led_Grouped.Channel_Select, i, false);                
-            }
-
-            for (int i = 0; i < 8; i++)
-            {
-                Led(Button_One_Color_Led_Grouped.Clip_Stop, i, false);                
-            }
-
-            for (int i = 0; i < 8; i++)
-            {
-                Led(Button_One_Color_Led_Grouped.One, i, false);                
-            }
-
-            for (int i = 0; i < 8; i++)
-            {
-                Led(Button_One_Color_Led_Grouped.REC, i, false);                
-            }
-
-            for (int i = 0; i < 8; i++)
-            {
-                Led(Button_One_Color_Led_Grouped.Single, i, false);                
-            }
-
-            for (int i = 0; i < 8; i++)
-            {
-                Led(Button_dual_Color_led_Grouped.A_B, i, Dual_Color_Color.off);
-            }
+            resetLed();
         }
 
         public void LinkMapping(APC40Mapping map)
