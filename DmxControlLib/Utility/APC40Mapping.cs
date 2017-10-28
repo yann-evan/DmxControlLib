@@ -43,12 +43,16 @@ namespace DmxControlLib.Utility
         public bool IsOnToogle;
 
         //off
-        public int offColor;
-        public bool offFlashing;
+        public int offprimaryColor;
+        public int offsecondaryColor;
+        public BlinkingType offFlashingtype;
+        public BlinkingSpeed offFlashingspeed;
 
         //on
-        public int onColor;
-        public bool onFlashing;
+        public int onprimaryColor;
+        public int onsecondaryColor;
+        public BlinkingType onFlashingtype;
+        public BlinkingSpeed onFlashingspeed;
 
         public RGBButton(int bID)
         {
@@ -58,11 +62,15 @@ namespace DmxControlLib.Utility
 
             Type = buttonType.Momentary;
 
-            offColor = 0;
-            offFlashing = false;
+            offprimaryColor = 0;
+            offsecondaryColor = 0;
+            offFlashingtype = BlinkingType.OneShot;
+            offFlashingspeed = BlinkingSpeed._1_2;
 
-            onColor = 0;
-            onFlashing = false;
+            onprimaryColor = 0;
+            onsecondaryColor = 0;
+            onFlashingtype = BlinkingType.OneShot;
+            onFlashingspeed = BlinkingSpeed._1_2;
 
             Groupe = -1;
         }

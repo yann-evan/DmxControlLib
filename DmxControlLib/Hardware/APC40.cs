@@ -364,7 +364,7 @@ namespace DmxControlLib.Hardware
                             {
                                  if(Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).Type == buttonType.Momentary) //si Bouton Momentanné
                                 {
-                                    Led((RGB_Led)(int)_BUTTONID, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).onColor);
+                                    Led((RGB_Led)(int)_BUTTONID, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).onFlashingtype, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).onprimaryColor, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).onsecondaryColor, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).onFlashingspeed);
 
                                     if (Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).Groupe != -1)
                                     {
@@ -372,7 +372,7 @@ namespace DmxControlLib.Hardware
                                         {
                                             if (bt.Groupe == Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).Groupe && bt.ID != (int)_BUTTONID)
                                             {
-                                                Led((RGB_Led)bt.ID, Mapping.RGBBT.Find(x => x.ID == bt.ID).offColor);
+                                                Led((RGB_Led)bt.ID, Mapping.RGBBT.Find(x => x.ID == bt.ID).offFlashingtype, Mapping.RGBBT.Find(x => x.ID == bt.ID).offprimaryColor, Mapping.RGBBT.Find(x => x.ID == bt.ID).offsecondaryColor, Mapping.RGBBT.Find(x => x.ID == bt.ID).offFlashingspeed);
                                                 Mapping.RGBBT.Find(x => x.ID == bt.ID).IsOnToogle = false;
                                             }
                                         }
@@ -383,12 +383,12 @@ namespace DmxControlLib.Hardware
                                 {
                                     if(Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).IsOnToogle == true)
                                     {
-                                        Led((RGB_Led)(int)_BUTTONID, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).offColor);
+                                        Led((RGB_Led)(int)_BUTTONID, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).offFlashingtype, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).offprimaryColor, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).offsecondaryColor, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).offFlashingspeed);
                                         Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).IsOnToogle = false;
                                     }
                                     else
                                     {
-                                        Led((RGB_Led)(int)_BUTTONID, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).onColor);
+                                        Led((RGB_Led)(int)_BUTTONID, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).onFlashingtype, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).onprimaryColor, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).onsecondaryColor, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).onFlashingspeed);
                                         Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).IsOnToogle = true;
 
                                         if(Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).Groupe != -1)
@@ -397,7 +397,7 @@ namespace DmxControlLib.Hardware
                                             {
                                                 if(bt.Groupe == Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).Groupe && bt.ID != (int)_BUTTONID)
                                                 {
-                                                    Led((RGB_Led)bt.ID, Mapping.RGBBT.Find(x => x.ID == bt.ID).offColor);
+                                                    Led((RGB_Led)bt.ID, Mapping.RGBBT.Find(x => x.ID == bt.ID).offFlashingtype, Mapping.RGBBT.Find(x => x.ID == bt.ID).offprimaryColor, Mapping.RGBBT.Find(x => x.ID == bt.ID).offsecondaryColor, Mapping.RGBBT.Find(x => x.ID == bt.ID).offFlashingspeed);
                                                     Mapping.RGBBT.Find(x => x.ID == bt.ID).IsOnToogle = false;
                                                 }
                                             }
@@ -410,7 +410,7 @@ namespace DmxControlLib.Hardware
                             {
                                 if(Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).Type == buttonType.Momentary) //si Bouton Momentanné
                                 {
-                                    Led((RGB_Led)(int)_BUTTONID, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).offColor);
+                                    Led((RGB_Led)(int)_BUTTONID, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).offFlashingtype, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).offprimaryColor, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).offsecondaryColor, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).offFlashingspeed);
                                 }
                             }
                         }
@@ -423,9 +423,11 @@ namespace DmxControlLib.Hardware
             _InputAPC40.StartRecording();
         }
 
-        public void Led(RGB_Led LedID, int color)
+        public void Led(RGB_Led LedID, BlinkingType type, int primarycolor, int secondarycolor, BlinkingSpeed speed)
         {
-            _OuputAPC40.Send(new ChannelMessage(ChannelCommand.NoteOn, 0, (int)LedID, color));
+            _OuputAPC40.Send(new ChannelMessage(ChannelCommand.NoteOn, 0, (int)LedID, primarycolor));
+
+            _OuputAPC40.Send(new ChannelMessage(ChannelCommand.NoteOn, (int)type * (int)speed, (int)LedID, secondarycolor)); 
         }
 
         public void Led(Button_One_Color_Led LedID, bool IsOn)
@@ -445,60 +447,10 @@ namespace DmxControlLib.Hardware
 
         public void resetLed()
         {
-            Led(RGB_Led.Pad0, 0);
-            Led(RGB_Led.Pad8, 0);
-            Led(RGB_Led.Pad16, 0);
-            Led(RGB_Led.Pad24, 0);
-            Led(RGB_Led.Pad32, 0);
-
-            Led(RGB_Led.Pad0 + 1, 0);
-            Led(RGB_Led.Pad8 + 1, 0);
-            Led(RGB_Led.Pad16 + 1, 0);
-            Led(RGB_Led.Pad24 + 1, 0);
-            Led(RGB_Led.Pad32 + 1, 0);
-
-            Led(RGB_Led.Pad0 + 2, 0);
-            Led(RGB_Led.Pad8 + 2, 0);
-            Led(RGB_Led.Pad16 + 2, 0);
-            Led(RGB_Led.Pad24 + 2, 0);
-            Led(RGB_Led.Pad32 + 2, 0);
-
-            Led(RGB_Led.Pad0 + 3, 0);
-            Led(RGB_Led.Pad8 + 3, 0);
-            Led(RGB_Led.Pad16 + 3, 0);
-            Led(RGB_Led.Pad24 + 3, 0);
-            Led(RGB_Led.Pad32 + 3, 0);
-
-            Led(RGB_Led.Pad0 + 4, 0);
-            Led(RGB_Led.Pad8 + 4, 0);
-            Led(RGB_Led.Pad16 + 4, 0);
-            Led(RGB_Led.Pad24 + 4, 0);
-            Led(RGB_Led.Pad32 + 4, 0);
-
-            Led(RGB_Led.Pad0 + 5, 0);
-            Led(RGB_Led.Pad8 + 5, 0);
-            Led(RGB_Led.Pad16 + 5, 0);
-            Led(RGB_Led.Pad24 + 5, 0);
-            Led(RGB_Led.Pad32 + 5, 0);
-
-            Led(RGB_Led.Pad0 + 6, 0);
-            Led(RGB_Led.Pad8 + 6, 0);
-            Led(RGB_Led.Pad16 + 6, 0);
-            Led(RGB_Led.Pad24 + 6, 0);
-            Led(RGB_Led.Pad32 + 6, 0);
-
-            Led(RGB_Led.Pad0 + 7, 0);
-            Led(RGB_Led.Pad8 + 7, 0);
-            Led(RGB_Led.Pad16 + 7, 0);
-            Led(RGB_Led.Pad24 + 7, 0);
-            Led(RGB_Led.Pad32 + 7, 0);
-
-            Led(RGB_Led.Scene_Launch0, 0);
-            Led(RGB_Led.Scene_Launch1, 0);
-            Led(RGB_Led.Scene_Launch2, 0);
-            Led(RGB_Led.Scene_Launch3, 0);
-            Led(RGB_Led.Scene_Launch4, 0);
-
+            for (int i = 0; i < 40; i++)
+            {
+                Led((RGB_Led)i, BlinkingType.OneShot, 0, 0, BlinkingSpeed._1_24);
+            }
 
             Led(Button_One_Color_Led.Pan, false);
             Led(Button_One_Color_Led.Sends, false);
@@ -521,30 +473,10 @@ namespace DmxControlLib.Hardware
             for (int i = 0; i < 8; i++)
             {
                 Led(Button_One_Color_Led_Grouped.Channel_Select, i, false);
-            }
-
-            for (int i = 0; i < 8; i++)
-            {
                 Led(Button_One_Color_Led_Grouped.Clip_Stop, i, false);
-            }
-
-            for (int i = 0; i < 8; i++)
-            {
                 Led(Button_One_Color_Led_Grouped.One, i, false);
-            }
-
-            for (int i = 0; i < 8; i++)
-            {
                 Led(Button_One_Color_Led_Grouped.REC, i, false);
-            }
-
-            for (int i = 0; i < 8; i++)
-            {
                 Led(Button_One_Color_Led_Grouped.Single, i, false);
-            }
-
-            for (int i = 0; i < 8; i++)
-            {
                 Led(Button_dual_Color_led_Grouped.A_B, i, Dual_Color_Color.off);
             }
         }
@@ -554,77 +486,11 @@ namespace DmxControlLib.Hardware
             int Time = 10;
             Random rand = new Random();
 
-            
-
-            Led(RGB_Led.Pad0, rand.Next(0, 127));
-            Led(RGB_Led.Pad8, rand.Next(0, 127));
-            Led(RGB_Led.Pad16, rand.Next(0, 127));
-            Led(RGB_Led.Pad24, rand.Next(0, 127));
-            Led(RGB_Led.Pad32, rand.Next(0, 127));
-
-            System.Threading.Thread.Sleep(Time);
-
-            Led(RGB_Led.Pad0 + 1, rand.Next(0, 127));
-            Led(RGB_Led.Pad8 + 1, rand.Next(0, 127));
-            Led(RGB_Led.Pad16 + 1, rand.Next(0, 127));
-            Led(RGB_Led.Pad24 + 1, rand.Next(0, 127));
-            Led(RGB_Led.Pad32 + 1, rand.Next(0, 127));
-
-            System.Threading.Thread.Sleep(Time);
-
-            Led(RGB_Led.Pad0 + 2, rand.Next(0, 127));
-            Led(RGB_Led.Pad8 + 2, rand.Next(0, 127));
-            Led(RGB_Led.Pad16 + 2, rand.Next(0, 127));
-            Led(RGB_Led.Pad24 + 2, rand.Next(0, 127));
-            Led(RGB_Led.Pad32 + 2, rand.Next(0, 127));
-
-            System.Threading.Thread.Sleep(Time);
-
-            Led(RGB_Led.Pad0 + 3, rand.Next(0, 127));
-            Led(RGB_Led.Pad8 + 3, rand.Next(0, 127));
-            Led(RGB_Led.Pad16 + 3, rand.Next(0, 127));
-            Led(RGB_Led.Pad24 + 3, 9);
-            Led(RGB_Led.Pad32 + 3, 9);
-
-            System.Threading.Thread.Sleep(Time);
-
-            Led(RGB_Led.Pad0 + 4, rand.Next(0, 127));
-            Led(RGB_Led.Pad8 + 4, rand.Next(0, 127));
-            Led(RGB_Led.Pad16 + 4, rand.Next(0, 127));
-            Led(RGB_Led.Pad24 + 4, rand.Next(0, 127));
-            Led(RGB_Led.Pad32 + 4, rand.Next(0, 127));
-
-            System.Threading.Thread.Sleep(Time);
-
-            Led(RGB_Led.Pad0 + 5, rand.Next(0, 127));
-            Led(RGB_Led.Pad8 + 5, rand.Next(0, 127));
-            Led(RGB_Led.Pad16 + 5, rand.Next(0, 127));
-            Led(RGB_Led.Pad24 + 5, rand.Next(0, 127));
-            Led(RGB_Led.Pad32 + 5, rand.Next(0, 127));
-
-            System.Threading.Thread.Sleep(Time);
-
-            Led(RGB_Led.Pad0 + 6, rand.Next(0, 127));
-            Led(RGB_Led.Pad8 + 6, rand.Next(0, 127));
-            Led(RGB_Led.Pad16 + 6, rand.Next(0, 127));
-            Led(RGB_Led.Pad24 + 6, rand.Next(0, 127));
-            Led(RGB_Led.Pad32 + 6, rand.Next(0, 127));
-
-            System.Threading.Thread.Sleep(Time);
-
-            Led(RGB_Led.Pad0 + 7, rand.Next(0, 127));
-            Led(RGB_Led.Pad8 + 7, rand.Next(0, 127));
-            Led(RGB_Led.Pad16 + 7, rand.Next(0, 127));
-            Led(RGB_Led.Pad24 + 7, rand.Next(0, 127));
-            Led(RGB_Led.Pad32 + 7, rand.Next(0, 127));
-
-            System.Threading.Thread.Sleep(Time);
-
-            Led(RGB_Led.Scene_Launch0, rand.Next(0, 127));
-            Led(RGB_Led.Scene_Launch1, rand.Next(0, 127));
-            Led(RGB_Led.Scene_Launch2, rand.Next(0, 127));
-            Led(RGB_Led.Scene_Launch3, rand.Next(0, 127));
-            Led(RGB_Led.Scene_Launch4, rand.Next(0, 127));
+            for (int i = 0; i < 40; i++)
+            {
+                Led((RGB_Led)i, BlinkingType.OneShot, rand.Next(0, 127), rand.Next(0, 127), BlinkingSpeed._1_2);
+                System.Threading.Thread.Sleep(Time*10);
+            }
 
             System.Threading.Thread.Sleep(Time);
 
@@ -692,8 +558,17 @@ namespace DmxControlLib.Hardware
 
             foreach (RGBButton item in Mapping.RGBBT)
             {
-                Led((RGB_Led)item.ID, item.offColor);
+                Led((RGB_Led)item.ID, item.offFlashingtype, item.offprimaryColor, item.offsecondaryColor, item.offFlashingspeed);
             }
+        }
+
+        public void __TestFunc__()
+        {
+            _OuputAPC40.Send(new ChannelMessage(ChannelCommand.NoteOn, 1, 12, 21));
+
+            _OuputAPC40.Send(new ChannelMessage(ChannelCommand.NoteOn, 10, 14, 21));
+
+            _OuputAPC40.Send(new ChannelMessage(ChannelCommand.NoteOn, 15, 16, 21));
         }
     }
 

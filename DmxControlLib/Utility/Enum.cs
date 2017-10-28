@@ -30,6 +30,23 @@ namespace DmxControlLib.Utility
         other
     }
 
+    public enum BlinkingType
+    {
+        OneShot = 1,
+        Pulsing = 2,
+        blinking = 3
+    }
+
+    public enum BlinkingSpeed
+    {
+        _1_24 = 1,
+        _1_16 = 2,
+        _1_8 = 3,
+        _1_4 = 4,
+        _1_2 = 5
+
+    }
+
     #region  Input APC40 MKII
     public enum APC40_Code_ID
     {
