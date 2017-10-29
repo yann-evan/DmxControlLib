@@ -355,6 +355,8 @@ namespace DmxControlLib.Hardware
                         APC40_Button_Input(this, new APC40InputButtonEventArgs { ButtonID = _BUTTONID, isOn = _ISON });
                     }
 
+                    _virtualMidiPort.sendCommand(e.Message.GetBytes());
+
                     #region Mapping
                     if (Mapping != null)
                     {
@@ -443,6 +445,11 @@ namespace DmxControlLib.Hardware
         public void Led(Button_dual_Color_led_Grouped LedID, int LedChannel, Dual_Color_Color color)
         {
             _OuputAPC40.Send(new ChannelMessage(ChannelCommand.NoteOn, LedChannel, (int)LedID, Convert.ToInt32(color)));
+        }
+
+        public void Pot_Led_Conf(Pot_Led_Conf_ID ID, Pot_Led_Conf_Type configuration)
+        {
+            _OuputAPC40.Send(new ChannelMessage(ChannelCommand.Controller, 0, (int)ID, (int)configuration));
         }
 
         public void resetLed()
@@ -564,11 +571,10 @@ namespace DmxControlLib.Hardware
 
         public void __TestFunc__()
         {
-            _OuputAPC40.Send(new ChannelMessage(ChannelCommand.NoteOn, 1, 12, 21));
-
-            _OuputAPC40.Send(new ChannelMessage(ChannelCommand.NoteOn, 10, 14, 21));
-
-            _OuputAPC40.Send(new ChannelMessage(ChannelCommand.NoteOn, 15, 16, 21));
+            foreach(Pot_Led_Conf_ID item in Enum.GetValues(typeof(Pot_Led_Conf_ID)))
+            {
+                Pot_Led_Conf(item, Pot_Led_Conf_Type.Volume);
+            }
         }
     }
 

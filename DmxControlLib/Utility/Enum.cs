@@ -170,6 +170,7 @@ namespace DmxControlLib.Utility
         Left = 97,
         Right = 96
     }
+
     #endregion
 
     #region Output A MKII
@@ -267,6 +268,35 @@ namespace DmxControlLib.Utility
         off = 0,
         yellow = 1,
         orange = 2,
+    }
+
+    public enum Pot_Led_Conf_ID
+    {
+        Top_Pot0 = 56,
+        Top_Pot1 = 57,
+        Top_Pot2 = 58,
+        Top_Pot3 = 59,
+        Top_Pot4 = 60,
+        Top_Pot5 = 61,
+        Top_Pot6 = 62,
+        Top_Pot7 = 63,
+
+        Device_control0 = 24,
+        Device_control1 = 25,
+        Device_control2 = 26,
+        Device_control3 = 27,
+        Device_control4 = 28,
+        Device_control5 = 29,
+        Device_control6 = 30,
+        Device_control7 = 31,
+    }
+
+    public enum Pot_Led_Conf_Type
+    {
+        Off = 0,
+        Single = 1,
+        Volume = 2,
+        Pan = 3
     }
     #endregion
 }
