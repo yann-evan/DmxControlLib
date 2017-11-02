@@ -7,24 +7,30 @@ using System.IO.Ports;
 
 namespace DmxControlLib.Hardware
 {
-    public static class DmxController
+    public class DmxController
     {
+        /// <summary>
+        /// Port COM par default
+        /// </summary>
         const string defaultComPort = "COM6";
 
         /// <summary>
         /// Serial port Object
         /// </summary>
-        private static SerialPort _SerialPort;
+        private  SerialPort _SerialPort;
 
         /// <summary>
         /// Is Controlleur Connected ?
         /// </summary>
-        static bool connected = false;
+        bool connected = false;
 
         /// <summary>
-        /// connect DmxController
+        /// Connecte le Controlleur DMX
         /// </summary>
-        public static void Connect(string ComPort)
+        /// <param name="ComPort"></param>
+        /// <exception cref="ErrorDmxConnectionException"
+        /// <exception cref="AlreadyConnectedDmxDeviceException"
+        public void Connect(string ComPort)
         {
             if (!connected)
             {
@@ -51,7 +57,7 @@ namespace DmxControlLib.Hardware
         /// <summary>
         /// connect DmxController with defaultComPort
         /// </summary>
-        public static void Connect()
+        public void Connect()
         {
             Connect(defaultComPort);
         }
@@ -60,7 +66,7 @@ namespace DmxControlLib.Hardware
         /// Return ID of the controlleur
         /// </summary>
         /// <returns>Controlleurs' ID</returns>
-        public static string GetID()
+        public string GetID()
         {
             string id = "";
             _SerialPort.Write("i");
@@ -74,7 +80,9 @@ namespace DmxControlLib.Hardware
         /// </summary>
         /// <param name="channel"></param>
         /// <param name="value"></param>
-        public static void WriteValue(int channel, int value)
+        /// <exception cref="ErrorDmxSendDataException"
+        /// <exception cref="NoDmxDeviceConnectedException"
+        public void WriteValue(int channel, int value)
         {
             if (connected)
             {
@@ -104,7 +112,7 @@ namespace DmxControlLib.Hardware
         /// <summary>
         /// Close Controlleur
         /// </summary>
-        public static void Close()
+        public void Close()
         {
             if (_SerialPort != null)
             {
@@ -122,7 +130,7 @@ namespace DmxControlLib.Hardware
         /// Is open ?
         /// </summary>
         /// <returns></returns>
-        public static bool IsOpen()
+        public bool IsOpen()
         {
             return connected;
         }

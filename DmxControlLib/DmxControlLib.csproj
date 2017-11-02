@@ -61,6 +61,7 @@
     <Compile Include="Utility\Enum.cs" />
     <Compile Include="Utility\LaunchpadMapping.cs" />
     <Compile Include="Utility\lightingDescription.cs" />
+    <Compile Include="Utility\Log.cs" />
     <Compile Include="Utility\teVirtualMIDI.cs" />
   </ItemGroup>
   <ItemGroup>

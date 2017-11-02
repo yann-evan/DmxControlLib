@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Sanford.Multimedia.Midi;
 using DmxControlLib.Utility;
 using System.Diagnostics;
@@ -16,7 +12,7 @@ namespace DmxControlLib.Hardware
      * description : Controlle et gestion des Output Input MIDI du controlleur MIDI AKAI APC-40(Evenement Input, leds ...)
      * état : dévellopement
      */
-    
+
     public class APC40
     {
         #region constantes
@@ -130,49 +126,70 @@ namespace DmxControlLib.Hardware
         /// <summary>
         /// Constructeur + decouverte MIDI
         /// </summary>
+        /// <exception cref="AlreadyConnectedAPC40Device"
+        /// <exception cref="NoAPC40FoundException"
         public APC40()
         {
-            _virtualMidiPort = new TeVirtualMIDI("VirtualPort"); //Init du port virtuel
 
             _msg = new ChannelMessageBuilder(); //Init du builder de msg MIDI
 
             if(!connected)
             {
-                InDevCount = InputDevice.DeviceCount;
-                OutDevCount = OutputDevice.DeviceCount;
+                Log.writeLine("Initialisation de l'APC40");
 
+                InDevCount = InputDevice.DeviceCount;
+                Log.writeLine("Nombre de d'interface MIDI en Input détecté -> " + InDevCount);
+                OutDevCount = OutputDevice.DeviceCount;
+                Log.writeLine("Nombre de d'interface MIDI en Output détecté -> " + OutDevCount);
                 #region Découverte Interfaces MIDI
 
+                Log.writeLine("");
+                Log.writeLine("Decouverte des interfaces :");
+
+                //Interfaces d'entrées
+                Log.writeLine("interface MIDI trouvées en entrée");
                 for (int i = 0; i < InDevCount; i++)
                 {
-                    Debug.WriteLine("device(input) n°" + i + ": " + InputDevice.GetDeviceCapabilities(i).name);
+                    Log.writeLine(i + ">" + InputDevice.GetDeviceCapabilities(i).name);
                     if (InputDevice.GetDeviceCapabilities(i).name == APC40Name)
                     {
-                        Debug.WriteLine("device n°" + i + " is APC40 for Input");
                         APC40InID = i;
                     }
                 }
 
+                //interfaces de sorties
+                Log.writeLine("interface MIDI trouvées en sortie");
                 for (int i = 0; i < OutDevCount; i++)
                 {
-                    Debug.WriteLine("device(input) n°" + i + ": " + OutputDevice.GetDeviceCapabilities(i).name);
+                    Log.writeLine(i + ">" + OutputDevice.GetDeviceCapabilities(i).name);
                     if (OutputDevice.GetDeviceCapabilities(i).name == APC40Name)
                     {
-                        Debug.WriteLine("device n°" + i + " is APC40 for ouput");
                         APC40OutID = i;
                     }
                 }
 
                 if(APC40InID == -1 || APC40OutID == -1)
                 {
-                    throw new NoAPC40FoundException();
+                    connected = true;
+                    close();
+
+                    Log.writeLine("Aucun APC40 trouvée");
+                    Log.writeLine("----------------------------------------------------------------------------");
+                    Log.writeLine("----------------------------------------------------------------------------");
+
+                    throw new NoAPC40FoundException(); //aucune interface trouvée
                 }
+
+                _virtualMidiPort = new TeVirtualMIDI("VirtualPort"); //Init du port virtuel
                 #endregion
 
 
             }
             else
             {
+                Log.writeLine("APC40 déja connectée");
+                Log.writeLine("----------------------------------------------------------------------------");
+                Log.writeLine("----------------------------------------------------------------------------");
                 throw new AlreadyConnectedAPC40Device(); //interface déja connectée
             }
 
@@ -182,24 +199,33 @@ namespace DmxControlLib.Hardware
         /// <summary>
         /// Connexion MIDI de l'APC40
         /// </summary>
+        /// <exception cref="ErrorAPC40ConnexionException"
         public void open()
         {
             try
             {
+                Log.writeLine("----------------------------------------------------------------------------");
+                Log.writeLine("Connexion APC40");
+
                 _InputAPC40 = new InputDevice(APC40InID); //Init du flux d'entrée MIDI de l'interface
                 _OuputAPC40 = new OutputDevice(APC40OutID); //Init du flux de sortie MIDI de l'interface
 
                 _InputAPC40.ChannelMessageReceived += _InputAPC40_ChannelMessageReceived; //ajout évenement Input
+
                 _InputAPC40.StartRecording(); //début du scan d'entrée MIDI
 
                 _OuputAPC40.Send(new SysExMessage(InitConfByteMode1)); //envoi du message d'Initialisation de l'interface, passage en mode 1 (voir DOC Dev APC40)
-                Debug.WriteLine("APC40 Connecté");
+
 
                 connected = true;
+
             }
             catch
             {
-                throw new ErrorAPC40ConnexionException();
+                Log.writeLine("Impossible de connectér l'APC40");
+                Log.writeLine("----------------------------------------------------------------------------");
+                Log.writeLine("----------------------------------------------------------------------------");
+                throw new ErrorAPC40ConnexionException(); //erreur de connexion
             }
             
         }
@@ -207,33 +233,46 @@ namespace DmxControlLib.Hardware
         /// <summary>
         /// Déconnexion MIDI de l'APC40
         /// </summary>
+        /// <exception cref="AlreadyDisconnectedAPC40Device"
         public void close()
         {
             if(connected)
             {
-                if (_InputAPC40 != null)
+                try
                 {
-                    _InputAPC40.StopRecording();
-                    _InputAPC40.Close();
-                    Debug.WriteLine("Flux d'entrée arrêtée");
-                }
-                if (_OuputAPC40 != null)
-                {
-                    _OuputAPC40.Send(new SysExMessage(InitConfByteMode0)); //remise en mode par defaut
-                    _OuputAPC40.Close();
-                    Debug.WriteLine("Flux de sortie arrêtée");
-                }
-                if (_virtualMidiPort != null)
-                {
-                    _virtualMidiPort.shutdown();
-                    Debug.WriteLine("Port Midi virtuel arrêtée");
-                }
+                    Log.writeLine("Déconnexion APC40");
 
+                    if (_virtualMidiPort != null) //déconnexion du MIDI virtuel
+                    {
+                        _virtualMidiPort.shutdown();
+                    }
+                    if (_InputAPC40 != null) //déconnexion Input
+                    {
+                        _InputAPC40.StopRecording(); //fin de la capture des Input
+                        _InputAPC40.Close();
+                    }
+                    if (_OuputAPC40 != null) //déconnexion Output
+                    {
+                        _OuputAPC40.Send(new SysExMessage(InitConfByteMode0)); //remise en mode par defaut
+                        _OuputAPC40.Close();
+                    }
+                }
+                catch
+                {
+                    Log.writeLine("Erreur de deconnexion de l'APC40");
+                    Log.writeLine("----------------------------------------------------------------------------");
+                    Log.writeLine("----------------------------------------------------------------------------");
+                    throw new ErrorAPC40DisconnectionException();
+                }
                 connected = false;
+                
             }
             else
             {
-                throw new AlreadyDisconnectedAPC40Device();
+                Log.writeLine("APC40 déja déconnecté");
+                Log.writeLine("----------------------------------------------------------------------------");
+                Log.writeLine("----------------------------------------------------------------------------");
+                throw new AlreadyDisconnectedAPC40Device(); //interface deja deconnecté
             }
             
         }
@@ -242,21 +281,14 @@ namespace DmxControlLib.Hardware
         /// Evenement quand nouveaux message du APC40
         /// </summary>
         /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="e" ></param>
         private void _InputAPC40_ChannelMessageReceived(object sender, ChannelMessageEventArgs e)
         {
             _InputAPC40.StopRecording();
 
-            Debug.WriteLine("Nouvelle entrée Midi");
-            Debug.WriteLine("--------------------------------");
-            Debug.WriteLine(e.Message.Command);
-            Debug.WriteLine(e.Message.Data1);
-            Debug.WriteLine(e.Message.Data2);
-            Debug.WriteLine(e.Message.MidiChannel);
-            Debug.WriteLine("--------------------------------");
-            Debug.WriteLine("");
-
-            if(e.Message.Command == ChannelCommand.Controller)
+            Log.writeLine("----------------------------------------------------------------------------");
+            Log.writeLine("Nouvelle Input : " + e.Message.Message);
+            if (e.Message.Command == ChannelCommand.Controller)
             {
                 if(e.Message.Data1 == 47 || e.Message.Data1 == 13) //Si Codeur
                 {
@@ -281,7 +313,7 @@ namespace DmxControlLib.Hardware
                 } 
                 else
                 {
-                    if(e.Message.Data1 == 7) //si fader groupé
+                    if (e.Message.Data1 == 7) //si fader groupé
                     {
                         int _CHANNEL;
                         int _VALUE;
@@ -289,7 +321,7 @@ namespace DmxControlLib.Hardware
                         _CHANNEL = e.Message.MidiChannel;
                         _VALUE = e.Message.Data2;
 
-                        if(APC40_GroupedFader_Input != null)
+                        if (APC40_GroupedFader_Input != null)
                         {
                             APC40_GroupedFader_Input(this, new APC40InputGroupedFaderEventArgs { channel = _CHANNEL, value = _VALUE });
                         }
@@ -302,7 +334,7 @@ namespace DmxControlLib.Hardware
                         _POTID = (APC40_pot_ID)e.Message.Data1;
                         _VALUE = e.Message.Data2;
 
-                        if(APC40_Pot_Input != null)
+                        if (APC40_Pot_Input != null)
                         {
                             APC40_Pot_Input(this, new APC40InputPotEventArgs {PotID = _POTID, value = _VALUE });
                         }
@@ -313,6 +345,7 @@ namespace DmxControlLib.Hardware
             {
                 if((e.Message.Data1 <= 52 && e.Message.Data1 >= 48) || e.Message.Data1 == 66) //Si Bouton groupé
                 {
+
                     APC40_GroupedButton_ID _GROUPEDBUTTONID;
                     int _CHANNEL;
                     bool _ISON;
@@ -329,7 +362,7 @@ namespace DmxControlLib.Hardware
                         _ISON = false;
                     }
 
-                    if(APC40_GroupedButton_Input != null)
+                    if (APC40_GroupedButton_Input != null)
                     {
                         APC40_GroupedButton_Input(this, new APC40InputGroupedButtonEventArgs { GroupedButtonID = _GROUPEDBUTTONID, channel = _CHANNEL, isOn = _ISON });
                     }
@@ -362,45 +395,52 @@ namespace DmxControlLib.Hardware
                     {
                         if (((int)_BUTTONID >= 0 && (int)_BUTTONID <= 39) || ((int)_BUTTONID >= 82 && (int)_BUTTONID <= 86))//si Boutton avec Led RGB
                         {
-                            if(_ISON) // si appui
-                            {
-                                 if(Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).Type == buttonType.Momentary) //si Bouton Momentanné
-                                {
-                                    Led((RGB_Led)(int)_BUTTONID, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).onFlashingtype, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).onprimaryColor, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).onsecondaryColor, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).onFlashingspeed);
+                            RGBButton button = Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID);//récuperation du mapping du bouton
 
-                                    if (Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).Groupe != -1)
+                            if (_ISON) // si appui
+                            {
+                                 if(button.Type == buttonType.Momentary) //si Bouton Momentanné
+                                {
+                                    Led((RGB_Led)_BUTTONID, button.onFlashingtype, button.onprimaryColor, button.onsecondaryColor, button.onFlashingspeed);
+
+                                    if (button.Groupe != -1)// si bouton groupé
                                     {
-                                        foreach (RGBButton bt in Mapping.RGBBT)
+                                        foreach (RGBButton bt in Mapping.RGBBT) //on éteint tout les autres boutons du même groupe
                                         {
-                                            if (bt.Groupe == Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).Groupe && bt.ID != (int)_BUTTONID)
+
+                                            if (bt.Groupe == button.Groupe && bt.ID != (int)_BUTTONID)
                                             {
-                                                Led((RGB_Led)bt.ID, Mapping.RGBBT.Find(x => x.ID == bt.ID).offFlashingtype, Mapping.RGBBT.Find(x => x.ID == bt.ID).offprimaryColor, Mapping.RGBBT.Find(x => x.ID == bt.ID).offsecondaryColor, Mapping.RGBBT.Find(x => x.ID == bt.ID).offFlashingspeed);
-                                                Mapping.RGBBT.Find(x => x.ID == bt.ID).IsOnToogle = false;
+                                                RGBButton samegroupebutton = Mapping.RGBBT.Find(x => x.ID == bt.ID); //on recupère le mapping du bouton du meme groupe
+
+                                                Led((RGB_Led)bt.ID, samegroupebutton.offFlashingtype, samegroupebutton.offprimaryColor, samegroupebutton.offsecondaryColor, samegroupebutton.offFlashingspeed);
+                                                samegroupebutton.IsOnToogle = false;
                                             }
                                         }
                                     }
                                 }
 
-                                if (Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).Type == buttonType.Toogle) //si Bouton Toogle
+                                if (button.Type == buttonType.Toogle) //si Bouton Toogle
                                 {
-                                    if(Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).IsOnToogle == true)
+                                    if (button.IsOnToogle == true)
                                     {
-                                        Led((RGB_Led)(int)_BUTTONID, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).offFlashingtype, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).offprimaryColor, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).offsecondaryColor, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).offFlashingspeed);
-                                        Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).IsOnToogle = false;
+                                        Led((RGB_Led)_BUTTONID, button.offFlashingtype, button.offprimaryColor, button.offsecondaryColor, button.offFlashingspeed);
+                                        button.IsOnToogle = false;
                                     }
                                     else
                                     {
-                                        Led((RGB_Led)(int)_BUTTONID, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).onFlashingtype, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).onprimaryColor, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).onsecondaryColor, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).onFlashingspeed);
-                                        Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).IsOnToogle = true;
+                                        Led((RGB_Led)_BUTTONID, button.onFlashingtype, button.onprimaryColor, button.onsecondaryColor, button.onFlashingspeed);
+                                        button.IsOnToogle = true;
 
-                                        if(Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).Groupe != -1)
+                                        if(button.Groupe != -1) // si bouton groupé
                                         {
-                                            foreach (RGBButton bt in Mapping.RGBBT)
+                                            foreach (RGBButton bt in Mapping.RGBBT) //on éteint tout les autres boutons du même groupe
                                             {
-                                                if(bt.Groupe == Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).Groupe && bt.ID != (int)_BUTTONID)
+                                                if(bt.Groupe == button.Groupe && bt.ID != (int)_BUTTONID)
                                                 {
-                                                    Led((RGB_Led)bt.ID, Mapping.RGBBT.Find(x => x.ID == bt.ID).offFlashingtype, Mapping.RGBBT.Find(x => x.ID == bt.ID).offprimaryColor, Mapping.RGBBT.Find(x => x.ID == bt.ID).offsecondaryColor, Mapping.RGBBT.Find(x => x.ID == bt.ID).offFlashingspeed);
-                                                    Mapping.RGBBT.Find(x => x.ID == bt.ID).IsOnToogle = false;
+                                                    RGBButton samegroupebutton = Mapping.RGBBT.Find(x => x.ID == bt.ID); //on recupère le mapping du bouton du meme groupe
+
+                                                    Led((RGB_Led)bt.ID, samegroupebutton.offFlashingtype, samegroupebutton.offprimaryColor, samegroupebutton.offsecondaryColor, samegroupebutton.offFlashingspeed);
+                                                    samegroupebutton.IsOnToogle = false;
                                                 }
                                             }
                                         }
@@ -410,9 +450,9 @@ namespace DmxControlLib.Hardware
                             }
                             else //si relachement 
                             {
-                                if(Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).Type == buttonType.Momentary) //si Bouton Momentanné
+                                if(button.Type == buttonType.Momentary) //si Bouton Momentanné
                                 {
-                                    Led((RGB_Led)(int)_BUTTONID, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).offFlashingtype, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).offprimaryColor, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).offsecondaryColor, Mapping.RGBBT.Find(x => x.ID == (int)_BUTTONID).offFlashingspeed);
+                                    Led((RGB_Led)_BUTTONID, button.offFlashingtype, button.offprimaryColor, button.offsecondaryColor, button.offFlashingspeed);
                                 }
                             }
                         }
@@ -425,35 +465,137 @@ namespace DmxControlLib.Hardware
             _InputAPC40.StartRecording();
         }
 
+        /// <summary>
+        /// APC40 est connecté ?
+        /// </summary>
+        /// <returns></returns>
+        public bool IsOpen()
+        {
+            Log.writeLine("APC40 connecté : " + Convert.ToString(connected));
+            return connected;
+        }
+
+
+        #region LED
+
+        /// <summary>
+        /// Gestion  des Led RGB
+        /// </summary>
+        /// <param name="LedID"></param>
+        /// <param name="type"></param>
+        /// <param name="primarycolor"></param>
+        /// <param name="secondarycolor"></param>
+        /// <param name="speed"></param>
+        /// <exception cref="ErrorSendingDataToAPC40Exception"
         public void Led(RGB_Led LedID, BlinkingType type, int primarycolor, int secondarycolor, BlinkingSpeed speed)
         {
-            _OuputAPC40.Send(new ChannelMessage(ChannelCommand.NoteOn, 0, (int)LedID, primarycolor));
+            try
+            {
+                Log.writeLine("Changement Leds -> ID : " + LedID);
 
-            _OuputAPC40.Send(new ChannelMessage(ChannelCommand.NoteOn, (int)type * (int)speed, (int)LedID, secondarycolor)); 
+                _OuputAPC40.Send(new ChannelMessage(ChannelCommand.NoteOn, 0, (int)LedID, primarycolor));
+
+                _OuputAPC40.Send(new ChannelMessage(ChannelCommand.NoteOn, (int)type * (int)speed, (int)LedID, secondarycolor));
+            }
+            catch
+            {
+                Log.writeLine("Impossible de communiquer avec l'APC40");
+                throw new ErrorSendingDataToAPC40Exception();
+            }
         }
 
+        /// <summary>
+        /// Gestion des Leds Orange
+        /// </summary>
+        /// <param name="LedID"></param>
+        /// <param name="IsOn"></param>
+        /// <exception cref="ErrorSendingDataToAPC40Exception"
         public void Led(Button_One_Color_Led LedID, bool IsOn)
         {
-            _OuputAPC40.Send(new ChannelMessage(ChannelCommand.NoteOn, 0, (int)LedID, Convert.ToInt32(IsOn)));
+            try
+            {
+                Log.writeLine("Changement Leds -> ID : " + LedID);
+
+                _OuputAPC40.Send(new ChannelMessage(ChannelCommand.NoteOn, 0, (int)LedID, Convert.ToInt32(IsOn)));
+            }
+            catch
+            {
+                Log.writeLine("Impossible de communiquer avec l'APC40");
+                throw new ErrorSendingDataToAPC40Exception();
+            }
         }
 
+        /// <summary>
+        /// Gestion des Leds Orange groupé
+        /// </summary>
+        /// <param name="LedID"></param>
+        /// <param name="LedChannel"></param>
+        /// <param name="IsOn"></param>
+        /// <exception cref="ErrorSendingDataToAPC40Exception"
         public void Led(Button_One_Color_Led_Grouped LedID, int LedChannel, bool IsOn)
         {
-            _OuputAPC40.Send(new ChannelMessage(ChannelCommand.NoteOn, LedChannel, (int)LedID, Convert.ToInt32(IsOn)));
+            try
+            {
+                Log.writeLine("Changement Leds -> ID : " + LedID + " Channel : " + LedChannel);
+                _OuputAPC40.Send(new ChannelMessage(ChannelCommand.NoteOn, LedChannel, (int)LedID, Convert.ToInt32(IsOn)));
+            }
+            catch
+            {
+                Log.writeLine("Impossible de communiquer avec l'APC40");
+                throw new ErrorSendingDataToAPC40Exception();
+            }
         }
 
+        /// <summary>
+        /// gestion des Leds BiColor Groupés
+        /// </summary>
+        /// <param name="LedID"></param>
+        /// <param name="LedChannel"></param>
+        /// <param name="color"></param>
+        /// <exception cref="ErrorSendingDataToAPC40Exception"
         public void Led(Button_dual_Color_led_Grouped LedID, int LedChannel, Dual_Color_Color color)
         {
-            _OuputAPC40.Send(new ChannelMessage(ChannelCommand.NoteOn, LedChannel, (int)LedID, Convert.ToInt32(color)));
+            try
+            {
+                Log.writeLine("Changement Leds -> ID : " + LedID + " Channel : " + LedChannel);
+                _OuputAPC40.Send(new ChannelMessage(ChannelCommand.NoteOn, LedChannel, (int)LedID, Convert.ToInt32(color)));
+            }
+            catch
+            {
+                Log.writeLine("Impossible de communiquer avec l'APC40");
+                throw new ErrorSendingDataToAPC40Exception();
+            }
         }
+        #endregion
 
+        /// <summary>
+        /// Configuration des Leds des Potentiomètres
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="configuration"></param>
+        /// <exception cref="ErrorSendingDataToAPC40Exception"
         public void Pot_Led_Conf(Pot_Led_Conf_ID ID, Pot_Led_Conf_Type configuration)
         {
-            _OuputAPC40.Send(new ChannelMessage(ChannelCommand.Controller, 0, (int)ID, (int)configuration));
+            try
+            {
+                Log.writeLine("Changement Config Potar -> ID : " + ID + " Type : " + configuration);
+                _OuputAPC40.Send(new ChannelMessage(ChannelCommand.Controller, 0, (int)ID, (int)configuration));
+            }
+            catch
+            {
+                Log.writeLine("Impossible de communiquer avec l'APC40");
+                throw new ErrorSendingDataToAPC40Exception();
+            }
+            
         }
 
+        /// <summary>
+        /// Reset de toute les Leds
+        /// </summary>
         public void resetLed()
         {
+            Log.writeLine("Reset des Leds");
+
             for (int i = 0; i < 40; i++)
             {
                 Led((RGB_Led)i, BlinkingType.OneShot, 0, 0, BlinkingSpeed._1_24);
@@ -488,8 +630,12 @@ namespace DmxControlLib.Hardware
             }
         }
 
+        /// <summary>
+        /// Animation de démarrage
+        /// </summary>
         public void AnimatedStartAnimation()
         {
+            Log.writeLine("Animation des Leds");
             int Time = 10;
             Random rand = new Random();
 
@@ -497,6 +643,12 @@ namespace DmxControlLib.Hardware
             {
                 Led((RGB_Led)i, BlinkingType.OneShot, rand.Next(0, 127), rand.Next(0, 127), BlinkingSpeed._1_2);
                 System.Threading.Thread.Sleep(Time*10);
+            }
+
+            for (int i = 82; i < 87; i++)
+            {
+                Led((RGB_Led)i, BlinkingType.OneShot, rand.Next(0, 127), rand.Next(0, 127), BlinkingSpeed._1_2);
+                System.Threading.Thread.Sleep(Time * 10);
             }
 
             System.Threading.Thread.Sleep(Time);
@@ -559,21 +711,19 @@ namespace DmxControlLib.Hardware
             resetLed();
         }
 
+        /// <summary>
+        /// Link l4APC 40 Avec un Mapping
+        /// </summary>
+        /// <param name="map"></param>
         public void LinkMapping(APC40Mapping map)
         {
+            Log.writeLine("Link Mapping");
+
             Mapping = map;
 
             foreach (RGBButton item in Mapping.RGBBT)
             {
                 Led((RGB_Led)item.ID, item.offFlashingtype, item.offprimaryColor, item.offsecondaryColor, item.offFlashingspeed);
-            }
-        }
-
-        public void __TestFunc__()
-        {
-            foreach(Pot_Led_Conf_ID item in Enum.GetValues(typeof(Pot_Led_Conf_ID)))
-            {
-                Pot_Led_Conf(item, Pot_Led_Conf_Type.Volume);
             }
         }
     }
@@ -646,7 +796,13 @@ namespace DmxControlLib.Hardware
     {
         public ErrorSendingDataToAPC40Exception() : base("Erreur d'envoi")
         {
+        }
+    }
 
+    public class ErrorAPC40DisconnectionException : Exception
+    {
+        public ErrorAPC40DisconnectionException() : base("Impossible de déconnecté un controlleur Midi")
+        {
         }
     }
     #endregion

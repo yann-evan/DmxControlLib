@@ -6,12 +6,18 @@ using System.Threading.Tasks;
 
 namespace DmxControlLib.Utility
 {
+    /// <summary>
+    /// Type de bouton (Momentary, Toogle)
+    /// </summary>
     public enum buttonType
     {
         Toogle,
         Momentary
     }
 
+    /// <summary>
+    /// Couleur des boutons sur le Launchpad MINI
+    /// </summary>
     public enum ButtonColor
     {
         Red,
@@ -21,6 +27,9 @@ namespace DmxControlLib.Utility
         None
     }
 
+    /// <summary>
+    /// Type de channel pour un jeux DMX
+    /// </summary>
     public enum Channeltype
     {
         Pan,
@@ -30,6 +39,9 @@ namespace DmxControlLib.Utility
         other
     }
 
+    /// <summary>
+    /// Type de clignotement pour les boutons RGB de l'apc40
+    /// </summary>
     public enum BlinkingType
     {
         OneShot = 1,
@@ -37,6 +49,9 @@ namespace DmxControlLib.Utility
         blinking = 3
     }
 
+    /// <summary>
+    /// Vitesse de clignotement des bouton RGB pour l'apc40
+    /// </summary>
     public enum BlinkingSpeed
     {
         _1_24 = 1,
@@ -47,13 +62,18 @@ namespace DmxControlLib.Utility
 
     }
 
-    #region  Input APC40 MKII
+    /// <summary>
+    /// ID des Codeur sur l'apc40
+    /// </summary>
     public enum APC40_Code_ID
     {
         Cue_Level = 47,
         Tempo = 13
     }
 
+    /// <summary>
+    /// ID des potar sur l'apc40
+    /// </summary>
     public enum APC40_pot_ID
     {
         Top_Pot0 = 48,
@@ -79,6 +99,9 @@ namespace DmxControlLib.Utility
 
     }
 
+    /// <summary>
+    /// ID des bouton groupé sur l'apc40
+    /// </summary>
     public enum APC40_GroupedButton_ID
     {
         Clip_Stop = 52,
@@ -90,6 +113,9 @@ namespace DmxControlLib.Utility
         A_B = 66
     }
 
+    /// <summary>
+    /// ID des boutons sur l'apc40
+    /// </summary>
     public enum APC40_Button_ID
     {
         Pad0 = 0,
@@ -171,9 +197,9 @@ namespace DmxControlLib.Utility
         Right = 96
     }
 
-    #endregion
-
-    #region Output A MKII
+    /// <summary>
+    /// ID des Leds RGb sur l'apc40
+    /// </summary>
     public enum RGB_Led
     {
         Pad0 = 0,
@@ -224,6 +250,9 @@ namespace DmxControlLib.Utility
         Scene_Launch4 = 86,
     }
 
+    /// <summary>
+    /// ID des Leds Orange sur l'apc40
+    /// </summary>
     public enum Button_One_Color_Led
     {
         Master_Button = 80,
@@ -248,6 +277,9 @@ namespace DmxControlLib.Utility
         Bank = 103,
     }
 
+    /// <summary>
+    /// ID des boutons orange groupé sur l'apc40
+    /// </summary>
     public enum Button_One_Color_Led_Grouped
     {
         Clip_Stop = 52,
@@ -258,11 +290,17 @@ namespace DmxControlLib.Utility
         REC = 48
     }
 
+    /// <summary>
+    /// ID des Leds Bi_Color sur l'apc40
+    /// </summary>
     public enum Button_dual_Color_led_Grouped
     {
         A_B = 66
     }
 
+    /// <summary>
+    /// Couleurs des Leds Bi-color sur l'apc40
+    /// </summary>
     public enum Dual_Color_Color
     {
         off = 0,
@@ -270,6 +308,9 @@ namespace DmxControlLib.Utility
         orange = 2,
     }
 
+    /// <summary>
+    /// ID des Led de potar
+    /// </summary>
     public enum Pot_Led_Conf_ID
     {
         Top_Pot0 = 56,
@@ -291,6 +332,9 @@ namespace DmxControlLib.Utility
         Device_control7 = 31,
     }
 
+    /// <summary>
+    /// Type de configuration pour les leds des potar
+    /// </summary>
     public enum Pot_Led_Conf_Type
     {
         Off = 0,
@@ -298,5 +342,4 @@ namespace DmxControlLib.Utility
         Volume = 2,
         Pan = 3
     }
-    #endregion
 }

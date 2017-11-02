@@ -10,11 +10,20 @@ namespace DmxControlLib.Utility
     [Serializable]
     public class APC40Mapping
     {
-
+        /// <summary>
+        /// Nom du mapping
+        /// </summary>
         public string name;
 
+        /// <summary>
+        /// Liste des boutons RGB
+        /// </summary>
         public List<RGBButton> RGBBT;
 
+        /// <summary>
+        /// Initialisation du Mapping
+        /// </summary>
+        /// <param name="N"></param>
         public APC40Mapping(string N)
         {
             name = N;
